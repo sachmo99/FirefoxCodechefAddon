@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <!--Popper JS-->
+    <script src="bootstrap/popper.min.js"></script>
+    
+    <!-- CSS min.js-->
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- JS without popper-->
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    
+</head>
+
+<body>
+    <div class="container">
+        
+        <div class="">
+            <button type="button" class="btn btn-danger" id="options_button" style="float: right ;">Options</button>
+            <img src="images/codechef-logo.jpg" alt="codechef-logo" style="border-radius: 50%;  
+            object-fit:contain;
+                   width:auto;
+                   height:300px;
+                   "/>
+        </div>
+        <div class="input-group" id="input_box">
+            <span class="input-group-text" id="input-group-left-example">Link</span>
+            <input type="text" name="codechef_question_link" id="codechef_question_link" class="form-control" placeholder="Codechef Question Link" aria-label="Codechef Question Link" aria-describedby="input-group-left" />
+            <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="Copy to Clipboard" id="input-group-button-right" onclick="copyToClipboard(this)">CopyLink</button>
+            
+        </div>
+        <br/>
+        <div class="sample_file_div">
+            <textarea class="form-control" rows="3" cols="30" id="file_sample"></textarea>
+        </div>
+        </br>
+        <div class="input-group" id="template_file">
+            <span class="input-group-text" id="input-group-left-example">Template File</span>
+            <button class="btn btn-warning" id="templateloader" type="button">Refresh</button>
+            <!-- <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="Upload" id="input-group-button-right" onclick="copyTemplate()">CopyTemplate</button> -->
+
+        </div>
+    
+        <div>
+            <button class="btn btn-primary" id="final_button" style="border-radius: 30%; left:40%;top:50%; position:relative">Sublime!</button>
+        </div>
+        <br/>
+        <div class="disabled_state" id="disabled_state" style="visibility: hidden;">
+            <button type="button" class="btn btn-lg btn-primary" disabled>This is not a codechef page!</button>
+        </div>
+        <br/>
+
+    </div>
+
+    <script src="choose_page.js"></script>
+</body>
+
+
+
+</html>

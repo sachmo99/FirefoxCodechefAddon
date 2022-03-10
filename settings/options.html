@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <!--Popper JS-->
+    <script src="bootstrap/popper.min.js"></script>
+    
+    <!-- CSS min.js-->
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- JS without popper-->
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    
+  </head>
+
+  <body>
+
+    <div class="input-group" id="input_box_template">
+        <span class="input-group-text" id="input-group-left-example">Template File</span>
+        <input type="file" name="codechef_template_file" id="template_file_path" class="form-control" placeholder="Codechef Template File" aria-label="Template File" aria-describedby="input-group-left" />
+        <button type="button" class="btn btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="Upload" id="template_file_upload" onclick="">Upload</button>
+        
+    </div>
+    <br/>
+    <div>
+        <textarea id="uploaded_file_content" rows="30" cols="128" readonly>
+
+        </textarea>
+    </div>
+
+    <script src="options.js"></script>
+
+  </body>
+
+</html>

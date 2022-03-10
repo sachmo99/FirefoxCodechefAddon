@@ -1,0 +1,44 @@
+{
+    "manifest_version": 2,
+    "name": "CodeChefAddOn",
+    "version": "1.0",
+    "description": "Used to open sublime text and copy problem content into the cpp file",
+    "icons": {
+        "48": "icons/codechef-48.png"
+    },
+    "content_scripts": [
+        {
+            "matches": ["*://*.codechef.com/*"],
+            "js": ["codechef_sublime.js"]
+        }
+    ],
+    "browser_action": {
+        "browser_style": true,
+        
+        "default_popup": "popup/choose_page.html",
+        "default_icon" : {
+            "48":"icons/codechef-48.png"
+        }
+    },
+    "options_ui": {
+        "page":"settings/options.html",
+        "open_in_tab":  true,
+        "browser_style": true
+    },
+    "permissions": [
+        "tabs",
+        "clipboardWrite",
+        "clipboardRead",
+        "storage",
+        "downloads"
+        
+    ],
+    "browser_specific_settings": {
+        "gecko": {
+            "id":"codechefaddon@example.com"
+        }
+    }
+
+
+    
+}

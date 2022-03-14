@@ -1,8 +1,8 @@
 {
     "manifest_version": 2,
-    "name": "CodeChefAddOn",
+    "name": "CodeChefAddOn for Firefox",
     "version": "1.0",
-    "description": "Used to open sublime text and copy problem content into the cpp file",
+    "description": "An AddOn to combine a custom template file and scraped problem statement into a single submission file for easy coding.",
     "icons": {
         "48": "icons/codechef-48.png"
     },

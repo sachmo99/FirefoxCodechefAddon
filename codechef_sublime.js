@@ -1,14 +1,20 @@
-
-async function readPage() {
-    var result = "/* \n";
+/* readPage(lang_type) function scrapes the codechef problem page and creates a commented multi-line text content */
+async function readPage(lang_type) {
+    try{
+        console.log(lang_type);
+    var cmt_start = ""
+    var cmt_end = "";
+    cmt_start = lang_type == "py" ? "\"\"\"" : "/**";
+    cmt_end = lang_type == "py" ? "\"\"\"" : "**/";
     var problem = document.querySelectorAll("h1")[0].textContent.trim().split("\n");
     let problemName = problem[0];
     let problemCode=problem[1].trim();
     console.log("H1: " + problemName + "---" + problemCode);
+    var result = `${cmt_start} \n`;
     result += "// ProblemName:" + problemName + " " + problemCode + "\n";
     var content = document.getElementById("problem-statement").children;
-    console.log(content.length);
-    var bool = false;
+    //console.log(content.length);
+    
     for(var i =0;i< content.length;i++) {
         if(content[i].tagName == "ASIDE") {
             continue;
@@ -16,12 +22,19 @@ async function readPage() {
         result += " " + content[i].textContent.trim()  + "\n";
         
     }
-    result += "*/";
+    result += `${cmt_end}`;
     console.log(result);
-    //alignContent(content);
+  
     return result;
+}catch(err) {
+    console.error(err);
+    return " 402 Error: " + err;
+
+}
     
 }
+
+/*a handler function for reading browser storage content  */
 function onGotFileContent(result) {
     console.log("on gotfilecontent:" +result);
     console.log(`onGotFileContent:---:${result.file_content}`);
@@ -31,27 +44,27 @@ function onGotFileContent(result) {
         return "NO TEMPLATE FOUND!!";
     }
 }
+/** an error handler function for reading browser storage content */
 function onErrorFileContent(error) {
     console.log(`Error:${error};`);
 }
 
+/** Starting point of the content-script .. It receives a message from the popup and 
+ * responds with the content of readPage function and the browser storage content(only set by this extension*/
 (function() {
     if(window.hasRun) {
         return;
     }
     window.hasRun = true;
-
+    
     
 
     function handleMessage( request, sender, sendMessage) {
         
         console.log("Message from popup:" + request.message);
-        if(request.message === "COPY"){
-            var res = readPage().then(function(result1) {
-                // browser.storage.sync.set({
-                //     problemFile: result
-                // }).then((res)=>{console.log(`The New Problem has been setup!`)})
-                // .catch((err) => {console.log(`Error while setting problem!${err}`)});
+        if(request.message.length > 0){
+            var res = readPage(request.message).then(function(result1) {
+
                 var getting = browser.storage.sync.get("file_content");
                 getting.then(function(result) {
                     console.log("on gotfilecontent:" +result);
@@ -64,22 +77,10 @@ function onErrorFileContent(error) {
                         return "NO TEMPLATE FOUND!!";
                     }
                 },onErrorFileContent);
-                   
-                    
-                // return new Promise(resolve => {
-                //     setTimeout( () => {
-                //       resolve({response: result});
-                //     }, 1000);
-                //   });
                 
             });
             return true;
-            //return true;
             
-            // setTimeout(() => {
-            //     return Promise.resolve({response: res});
-            //   }, 1000);
-            //   return true;
 
         }
         
@@ -87,6 +88,8 @@ function onErrorFileContent(error) {
     }
     browser.runtime.onMessage.addListener(handleMessage);
 })();
+
+
 
 
 

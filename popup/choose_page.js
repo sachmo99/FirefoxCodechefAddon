@@ -1,3 +1,9 @@
+/** The JS of popup HTML file.. */
+
+/**Sets the file extension required for download */
+var language_button = "txt"; // default to be kept as txt
+
+/** functionto copy content present in the popup screen textbox onto clipboard */
 function copyToClipboard(e) {
     console.log("inside copytoclipboard");
     return navigator.clipboard.writeText(e.target.value)
@@ -5,18 +11,28 @@ function copyToClipboard(e) {
         .catch(() => false);
     
 }
+
+/** a message response handler function
+ * it receives the response from the content-script which is the complete content of the downloadable file
+ * It then uses this response to create a downloadable file with the required extension.
+ */
 function handleMessageResponse(message) {
+    
     var question_link = document.getElementById("codechef_question_link").value.split("/");
     var question_code = question_link[question_link.length -1];
     var textToSave = message.response + "\n\n";
     console.log(`Message from the content script:  ${message.response}`);
     //console.log(textToSave);
+    if(message.response.indexOf("402 Error:") != -1) {
+        console.error("Not a codechef problem page!!! Cannot find problem statement.");
+        return;
+    }
     var hiddenElement = document.createElement('a');
     var blob = new Blob([textToSave],{type:"text/*"});
 
     hiddenElement.href = window.URL.createObjectURL(blob);
     hiddenElement.target = '_blank';
-    hiddenElement.download = `${question_code}.cpp`;
+    hiddenElement.download = `${question_code}.${language_button}`;
     hiddenElement.onclick = function(e) {
         var that = this;
         setTimeout(function() {
@@ -25,33 +41,6 @@ function handleMessageResponse(message) {
     }
     hiddenElement.click();
     hiddenElement.remove();
-    //var template = browser.storage.sync.get("file_content");
-    // template.then((resu) =>{ 
-    //     if(resu.file_content)
-    //         {
-    //             textToSave+= resu.file_content;
-    //             console.log(textToSave);
-    //             var hiddenElement = document.createElement('a');
-
-    //             hiddenElement.href = 'data:attachment/text,' + encodeURI(textToSave);
-    //             hiddenElement.target = '_blank';
-    //             hiddenElement.download = `${question_code}.cpp`;
-    //             hiddenElement.click();
-    //             return resu.file_content
-    //         }
-    //     else{
-    //         textToSave+= "NO TEMPLATE FOUND!!!";
-    //         console.log(textToSave);
-    //         var hiddenElement = document.createElement('a');
-
-    //         hiddenElement.href = 'data:attachment/text,' + encodeURI(textToSave);
-    //         hiddenElement.target = '_blank';
-    //         hiddenElement.download = `${question_code}.cpp`;
-    //         hiddenElement.click();
-    //         return "NO TEMPLATE FOUND!!!";
-    //     } })
-    //     .catch((err)=> {console.log(`Error while reading storage: ${err};`)});
-    
     
   }
   
@@ -61,11 +50,19 @@ function handleMessageResponse(message) {
   function send(tab) {
     console.log("after button click:"+tab);
     console.log("final button (sublime) is clicked");
+    var msg = "non-py";
+    if(language_button == "py"){
+        msg = language_button;
+    }
+    console.log(msg);
     // send a message to content script to gather the content of the codechef page.
     browser.tabs.sendMessage(tab,{
-        message:"COPY"
+        message: msg
     }).then(handleMessageResponse,handleMessageError);
 }
+
+/** event to trigger a message to the content-script to scrape the problem statement from the active tab. */
+try{
 document.querySelector("#final_button").addEventListener("click",
 function () {
     var query = browser.tabs.query({currentWindow: true, active : true});
@@ -78,9 +75,13 @@ function () {
     function onError(error) {
       console.log(`Error: ${error}`);
     }
-    
-
 });
+}catch(err){
+    console.error(err);   
+}
+
+/** event listener to fetch latest template from the browser storage and display condensed form in the text area. */
+try{
 document.querySelector("#templateloader").addEventListener("click",
 function () {
     console.log("inside openAddonSettings function");
@@ -100,14 +101,26 @@ function () {
     let getting = browser.storage.sync.get("file_content");
     getting.then(onGot,onError);   
     
-    
 });
+}
+catch(err){
+    console.log(err);
+}
+
+/**button group trigger listener to change global language variable of the template which
+ * sets the extention of the downloadable file. */
+document.querySelector("#language_group").addEventListener('click',function(e) {
+    var btn =  e.target.id;
+    console.log(btn);
+    language_button = btn;
+}); 
 document.getElementById('options_button').addEventListener("click", function() {
     console.log("inside openAddonSettings function");
     console.log("creating a new tab");
     browser.runtime.openOptionsPage();
 } );
 
+/** a debug listener for noticing changes to the storage area of the extension. */
 window.addEventListener('load',(event) => {
     function storageUpdate(changes,area) {
         console.log("Change in storage Area:" + area);
@@ -130,26 +143,26 @@ window.addEventListener('load',(event) => {
     browser.storage.onChanged.addListener(storageUpdate);
 });
 
-
+/**an event listener function which is important to control/disable features of extension outside the codechef website */
 window.addEventListener("load", function(e) {
     var activeUrl = null;
    
     browser.tabs.query({currentWindow: true, active: true})
                                     .then((tabs) => {
                                         activeUrl = tabs[0].url;
-                                        console.error(tabs[0].url);
+                                        console.log(tabs[0].url);
                                         
                                         document.getElementById("codechef_question_link").value = tabs[0].url;
                                         urlCheck(activeUrl);
                                         
                                       });
-    
-  
   });
+  /** event listener to handle clipboard copy option. */ 
   document.getElementById('codechef_question_link').addEventListener("click",function(e) {
       copyToClipboard(e).then(res => {console.log("copied",res)});
   })
 
+  /** event listener function to show a slice of stored template in the popup text area.. */
   document.getElementById("file_sample").addEventListener("load",function() {
       
     console.log("Template copy function"); 
@@ -169,6 +182,9 @@ window.addEventListener("load", function(e) {
     
   },false);
 
+  /** this function is used to disable the sublime button and other codechef specific HTML content and majorly helps 
+   * against extension errors outside designated codechef pages.
+   */
   function urlCheck(url) {
     if(url.indexOf("codechef.com")!== -1){
         //if(/^(https?:\/\/(.+?\.)?codechef\.com(\/[A-Za-z0-9\-\._~:\/\??#\[\]@!$&'\(\)\*\+,;\=]*)?]))$/.test(activeUrl)) {
@@ -185,11 +201,12 @@ window.addEventListener("load", function(e) {
         }
   }
 
+  /**an alternate function to view the content of the template in a new tab ---- DEPRECATED function */
   function copyTemplate() {
       console.log("Template copy function");
       let template_file = document.getElementById("template_file_link").file;
       let reader = new FileReader();
-      console.log(file);
+      //console.log(file);
       reader.onload(function(thefile) {
           return function(e) {
               browser.tabs.create({
